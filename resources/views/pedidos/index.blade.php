@@ -14,7 +14,6 @@
                                 <td>Qtde Itens</td>
                                 <td>Valor Total</td>
                                 <td>Peso Total</td>
-                                <td>Desconto</td>
                                 <td>Data</td>
                                 <td>Status</td>
                                 <td>Ações</td>
@@ -27,14 +26,30 @@
                                     <td>{{ $pedido->QtdeItens }}</td>
                                     <td>{{ $pedido->ValorTotal }}</td>
                                     <td>{{ $pedido->PesoTotal }}</td>
-                                    <td>{{ $pedido->Desconto }}</td>
                                     <td>{{ $pedido->DataPedido }}</td>
-                                    <td>{{ $pedido->PedidoStatus }}</td>
                                     <td>
-                                        @if($pedido->PedidoStatus <> 3)
-                                            <a href="pedidos/itens/{{ $pedido->Id }}">Ver itens</a> | 
+                                        @if($pedido->PedidoStatus == 1)
+                                            Aberto
+                                        @elseif($pedido->PedidoStatus == 2)
+                                            Finalizado
+                                        @else 
+                                            Cancelado
                                         @endif
-                                        <a href="pedidos/cancela/{{ $pedido->Id }}">Cancelar</a>
+                                    </td>
+                                    <td>
+                                        @if($pedido->PedidoStatus == 1)
+                                            <a href="pedidos/itens/{{ $pedido->Id }}">Ver itens</a>  | 
+                                            <a href="pedidos/cancela/{{ $pedido->Id }}">Cancelar</a> | 
+                                            <a href="pedidos/finaliza/{{ $pedido->Id }}">Finalizar</a>
+                                        @else
+                                            <span style="color:#ccc">
+                                                Ver itens | 
+                                                Cancelar  | 
+                                                Finalizar
+                                            </span>
+                                        
+                                        @endif
+
                                     </td>
                                 <tr>
                             @empty

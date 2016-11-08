@@ -6,14 +6,24 @@ use Illuminate\Database\Eloquent\Model;
 
 class Produtos extends Model
 {
+   
+    public $timestamps = false;
+    protected $primaryKey = 'Id';
+    protected $foreignKey = ['MarcaId', 'CategoriaId'];
     protected $table = 'Produtos';
    
     protected $fillable = [
         'Id',
-        'Descicao',
+        'Nome',
+        'Descricao',
         'PrecoCusto',
         'PrecoVenda',
         'Peso',
         'ProdutoStatus',
+        'MarcaId',
+        'CategoriaId',
+        'Imagem'
     ];
+
+ 
 }

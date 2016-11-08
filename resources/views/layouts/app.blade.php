@@ -1,3 +1,5 @@
+@inject('cart', 'App\PedidoVendas')
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,11 +50,30 @@
                     <ul class="nav navbar-nav">
                         <li><a href="/pedidos">Pedidos</a></li>
                     </ul>
+                    
+                    <!-- Admin Toolbar -->
+                    <ul class="nav navbar-nav">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                Admin <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                                <li><a href="/admin/categorias">Categorias</a></li>
+                                <li><a href="/admin/marcas">Marcas</a></li>
+                                <li><a href="/admin/produtos">Produtos</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+
+
                     <!-- Right Side Of Navbar -->
                  
                     <ul class="nav navbar-nav navbar-right">
                         <li>
-                            <a href="#">2
+                            <a href="#">
+                                @if (!Auth::guest())
+                                    {{ $cart->where('UsuarioId', \Auth::user()->id)->where('PedidoStatus', '<>', 3)->get(['QtdeItens'])[0]->QtdeItens or 0 }}
+                                @endif
                                 <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true" style="color:white"></span>
                             </a>
                         <li>

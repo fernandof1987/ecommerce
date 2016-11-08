@@ -9,7 +9,8 @@ use App\PedidoVendas;
 class PedidoVendasController extends Controller
 {
     public function Index(){
-        $pedidos = PedidoVendas::where('UsuarioId', \Auth::user()->id)->get()->where('PedidoStatus', '<>', 3);
+        $pedidos = PedidoVendas::where('UsuarioId', \Auth::user()->id)->where('PedidoStatus', '<>', 3)->get();
+        //dd($pedidos);
         return view('pedidos.index', ['pedidos' => $pedidos]);
     }
 
@@ -17,6 +18,14 @@ class PedidoVendasController extends Controller
         $pedido = $pedidos->find($pedidoId);
         $pedido->timestamps = false;
         $pedido->PedidoStatus = 3;
+        $pedido->save();
+        return redirect()->back();        
+    }
+
+    public function finaliza($pedidoId, PedidoVendas $pedidos){
+        $pedido = $pedidos->find($pedidoId);
+        $pedido->timestamps = false;
+        $pedido->PedidoStatus = 2;
         $pedido->save();
         return redirect()->back();        
     }

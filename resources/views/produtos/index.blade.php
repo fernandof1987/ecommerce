@@ -2,17 +2,26 @@
 
 @section('content')
 
+
 <div class="container">
     <div class="row">
-        <div class="col-md-10 col-md-offset-1">
-            <h1>Produtos</h1>
-           
+        <div class="col-md-2">
+            <h3>Categorias</h3>
+             @include('produtos._categorias')
+        </div>
+        <div class="col-md-10 col-md-offset">
+            <h3>Produtos</h3>
             @forelse($produtos as $produto)
                 <div class="col-sm-6 col-md-4">
                     <div class="thumbnail">
                         <img src="/images/no-image.png" alt="...">
                         <div class="caption">
-                            <h3>{{ $produto->Id }} - {{ $produto->Descricao }}</h3>
+                            <h3>
+                                <a href="/produtos/{{ $produto->Id }}">
+                                    {{ $produto->Id }} - 
+                                    {{ $produto->Nome }}
+                                </a>
+                            </h3>
                             <p>R$ {{ $produto->PrecoVenda }}</p>
                             <p>
                                 <!--a href="#" class="btn btn-default" role="button">Detalhes</a-->
@@ -40,9 +49,11 @@
                 Não existem produtos cadastrados!
             @endforelse
 
-      
-
         </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-10">{{ $produtos->links() }}</div>
     </div>
 </div>
 

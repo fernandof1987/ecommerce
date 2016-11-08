@@ -15,7 +15,8 @@ class PedidoVendaItensController extends Controller
 
     public function itens($pedidoId){
         $itens = PedidoVendaItens::where('PedidoId', $pedidoId)->get();
-        return view('pedidos.itens', ['itens' => $itens]);
+        $pedido = PedidoVendas::find($pedidoId);
+        return view('pedidos.itens', ['itens' => $itens, 'pedido' => $pedido]);
     }
 
     public function addItem(Request $request, PedidoVendas $pedidos){
