@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PedidoVendas extends Model
 {
     protected $primaryKey = 'Id';
-    protected $foreignKey = 'UsuarioId';
+    protected $foreignKey = ['UsuarioId'];
     protected $table = 'PedidoVendas';
     //protected $timestamps = false;
    

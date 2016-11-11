@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\PedidoVendaItens;
 use App\PedidoVendas;
+use App\Estoque;
 
 class PedidoVendaItensController extends Controller
 {
@@ -13,8 +14,13 @@ class PedidoVendaItensController extends Controller
         return view('pedidos.itens', ['itens' => $itens]);
     }
 
-    public function itens($pedidoId){
-        $itens = PedidoVendaItens::where('PedidoId', $pedidoId)->get();
+    public function itens($pedidoId, PedidoVendaItens $itens){
+        $itens = $itens
+                ->join('Produtos', 'PedidoVendaItens.ProdutoId', '=', 'Produtos.Id')
+                //->leftJoin('Marcas', 'PedidoVendaItens.MarcaId', '=', 'Marcas.Id')
+                //->leftJoin('Categorias', 'PedidoVendaItens.CategoriaId', '=', 'Categorias.Id')
+                ->where('PedidoId', $pedidoId)->get();
+        //dd($itens);
         $pedido = PedidoVendas::find($pedidoId);
         return view('pedidos.itens', ['itens' => $itens, 'pedido' => $pedido]);
     }
@@ -46,10 +52,21 @@ class PedidoVendaItensController extends Controller
         $item->timestamps = false;
         //$item->desconto = 0;
 
-        //dd($item);
-        $item->save();
-        //return 'Iten Salvo';
-        return redirect()->action('PedidoVendaItensController@itens', ['PedidoId' => $pedidoId]);
+        $estoqueQtde = Estoque::where('ProdutoId', $item->ProdutoId)->get(['Qtde']);
+        
+        $estoqueQtde = (empty($estoqueQtde[0]->Qtde)) ? 0 : $estoqueQtde[0]->Qtde;
+
+        if($item->Qtde <= $estoqueQtde) {
+            $item->save();
+            return redirect()->action('PedidoVendaItensController@itens', ['PedidoId' => $pedidoId]);
+        }else{
+            $msg1 = "O Porduto {$item->ProdutoId} não possui a quantidade solicitada <br />";
+            $msg2 = "A qtde disponível é {$estoqueQtde} <br />";
+            $link = "<a href='/'>Voltar</a>";
+            $msg = $msg1 . $msg2;
+            return view('produtos.msg', ['msg' => $msg, 'link' => $link]);
+        }
+    
     }
 
     public function removeItem($itemId){

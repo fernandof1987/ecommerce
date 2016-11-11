@@ -51,19 +51,24 @@
                         <li><a href="/pedidos">Pedidos</a></li>
                     </ul>
                     
-                    <!-- Admin Toolbar -->
-                    <ul class="nav navbar-nav">
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                Admin <span class="caret"></span>
-                            </a>
-                            <ul class="dropdown-menu" role="menu">
-                                <li><a href="/admin/categorias">Categorias</a></li>
-                                <li><a href="/admin/marcas">Marcas</a></li>
-                                <li><a href="/admin/produtos">Produtos</a></li>
+                    @if(isset(\Auth::user()->id) and isset(\Auth::user()->id))
+                        @if(\Auth::user()->id == 1)
+                            <!-- Admin Toolbar -->
+                            <ul class="nav navbar-nav">
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                        Admin <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a href="/admin/categorias">Categorias</a></li>
+                                        <li><a href="/admin/marcas">Marcas</a></li>
+                                        <li><a href="/admin/produtos">Produtos</a></li>
+                                        <li><a href="/admin/estoque">Estoque</a></li>
+                                    </ul>
+                                </li>
                             </ul>
-                        </li>
-                    </ul>
+                        @endif
+                    @endif
 
 
                     <!-- Right Side Of Navbar -->
@@ -72,7 +77,7 @@
                         <li>
                             <a href="#">
                                 @if (!Auth::guest())
-                                    {{ $cart->where('UsuarioId', \Auth::user()->id)->where('PedidoStatus', '<>', 3)->get(['QtdeItens'])[0]->QtdeItens or 0 }}
+                                    {{ $cart->where('UsuarioId', \Auth::user()->id)->where('PedidoStatus', '=', 1)->get(['QtdeItens'])[0]->QtdeItens or 0 }}
                                 @endif
                                 <span class="glyphicon glyphicon-shopping-cart" aria-hidden="true" style="color:white"></span>
                             </a>

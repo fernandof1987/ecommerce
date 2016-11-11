@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div class="panel panel-default">
-                <div class="panel-heading">Cadastro de produtos<a href="/admin/produtos/create" class="pull-right btn btn-primary">Adicionar nova produto</a></div>
+                <div class="panel-heading">Cadastro de produtos<a href="/admin/produtos/create" class="pull-right btn btn-primary btn-xs">Adicionar nova produto</a></div>
                 <div class="panel-body">
                     <table class="table table-hover">
                         <tr>
@@ -28,8 +28,8 @@
                                 <td>{{ $produto->PrecoCusto }}</td>
                                 <td>{{ $produto->PrecoVenda }}</td>
                                 <td>{{ $produto->Peso }}</td>
-                                <td>{{ $produto->MarcaId }}</td>
-                                <td>{{ $produto->CategoriaId }}</td>
+                                <td>{{ $produto->Marca }}</td>
+                                <td>{{ $produto->Categoria }}</td>
                                 <td>{{ $produto->ProdutoStatus }}</td>
                                 <td>
                                     <a href="/admin/produtos/edit/{{ $produto->Id }}">Editar</a> | 

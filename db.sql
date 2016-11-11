@@ -94,16 +94,6 @@ go
 		(1, 2, 'Produto-08', 'Produto..........', 1.60, 1.90, 0.700, 1, null),
 		(1, 2, 'Produto-09', 'Produto..........', 1.60, 1.90, 0.700, 1, null)
 go
-create table Estoque(
-	Id int primary key identity,
-	ProdutoId int references Produtos(Id),
-	Qtde int,
-	Validade datetime null,
-	Lote int null
-	--constraint PkEstoque primary key(ProdutoId, Lote)
-)
-go
-
 
 create table PedidoStatus(
 	Id int primary key identity,
@@ -123,6 +113,17 @@ create table PedidoVendas(
 	DataPedido datetime default getdate() not null,
 	PedidoStatus int references PedidoStatus(Id) default 1 not null
 )
+go
+
+create table Estoque(
+	Id int primary key identity,
+	ProdutoId int references Produtos(Id),
+	Qtde int,
+	Validade datetime null,
+	Lote int null
+	--constraint PkEstoque primary key(ProdutoId, Lote)
+)
+
 go
 create table EstoqueSaida(
 	Id int primary key identity,
@@ -158,44 +159,13 @@ create table PedidoVendaItens(
 	ValorCusto decimal(10, 2) default 0 not null,
 	Desconto decimal(10, 2) default 0 not null,
 	ValorTotal as (Qtde * (ValorVenda - Desconto)),
-	Peso decimal(10, 3)
+	Peso decimal(10, 3),
+	CONSTRAINT Unique_PeidoItem UNIQUE (PedidoId, ProdutoId)
 )
-
---insert Users values ('Administrador', 'admin@admin.com', '123456', null, null, null)
---insert Clientes values ('Ana Maria', '63613695652', 1, 1, '08390060', 'Av Braz Leme')
---insert Produtos values ('Produto01', 1, 10.20, 15.00, 1.350, 1), ('Produto02', 1, 8.20, 10.50, 1.000, 1), ('Produto03', 2, 5.00, 7.00, 0.500, 1)
-
---insert EstoqueEntrada values ('1', getdate(), )
-
---insert PedidoVendas values (1, 0, 0, 0, 0, 0, getdate())
---insert PedidoVendaItens values (1, 1, 2, 15.00, 10.20, 0, 0), (1, 2, 5, 11.00, 8.00, 0, 0)
-
-/*
-update a set a.Peso = (select b.peso * a.qtde from Produtos b where a.ProdutoId = b.Id) from PedidoVendaItens a
-
-update a set
-	a.ValorTotal = (select sum(ValorTotal) from PedidoVendaItens b where b.PedidoId = a.Id),
-	a.CustoTotal = (select sum(ValorCusto * Qtde) from PedidoVendaItens b where b.PedidoId = a.Id),
-	a.QtdeItens = (select count(ProdutoId) from PedidoVendaItens b where b.PedidoId = a.Id),
-	a.PesoTotal = (select sum(peso) from PedidoVendaItens b where b.PedidoId = a.Id)
-	from PedidoVendas a
-*/
-
-select * from Users
-select * from UF
-select * from Cidade
-select * from Clientes
-select * from Produtos
-select * from PedidoVendas
-select * from PedidoVendaItens
-select * from Estoque
-select * from EstoqueSaida
-select * from EstoqueEntrada
 
 go
 
-
-create trigger TSomaItemPedidoAI
+create trigger TPedidoItemAI
 On PedidoVendaItens
 after insert
 as
@@ -205,15 +175,18 @@ begin
 	declare @peso decimal(10, 2)
 	declare @qtde int
 	declare @pedido int
+	declare @produtoId int
 
-	select @valorInserted = ValorTotal, @custoInserted = ValorCusto, @pedido = PedidoId, @peso = Peso, @qtde = Qtde from Inserted
+	select @produtoId = ProdutoId, @valorInserted = ValorTotal, @custoInserted = ValorCusto, @pedido = PedidoId, @peso = Peso, @qtde = Qtde from Inserted
 
 	update PedidoVendas set ValorTotal += @valorInserted, CustoTotal += @custoInserted, QtdeItens += 1, PesoTotal += (@peso * @qtde) where Id = @pedido
+
+	update Estoque set Qtde -= @qtde where ProdutoId = @produtoId
 end
 
 go
 
-create trigger TRemoveItemPedidoFD
+create trigger TPedidoItemFD
 On PedidoVendaItens
 for delete
 as
@@ -223,15 +196,18 @@ begin
 	declare @peso decimal(10, 2)
 	declare @qtde int
 	declare @pedido int
+	declare @produtoId int
 
-	select @valorDeleted = ValorTotal, @custoDeleted = ValorCusto, @pedido = PedidoId, @peso = Peso, @qtde = Qtde from deleted
+	select @produtoId = ProdutoId, @valorDeleted = ValorTotal, @custoDeleted = ValorCusto, @pedido = PedidoId, @peso = Peso, @qtde = Qtde from deleted
 
 	update PedidoVendas set ValorTotal -= @valorDeleted, CustoTotal -= @custoDeleted, QtdeItens -= 1, PesoTotal -= (@peso * @qtde) where Id = @pedido
+
+	update Estoque set Qtde += @qtde where ProdutoId = @produtoId
 end
 
 go
 
-create trigger TCalculaItemPedidoFU
+create trigger TPedidoItemFU
 On PedidoVendaItens
 for update
 as
@@ -249,9 +225,53 @@ begin
 	update PedidoVendas set ValorTotal -= @valorDeleted, CustoTotal -= @custoDeleted where Id = @pedido
 	update PedidoVendas set ValorTotal += @valorInserted, CustoTotal += @custoInserted where Id = @pedido
 
-	
 end
 
+go
+/*
+create Trigger TPedidoFD
+on PedidoVendas
+instead of delete
+as
+begin
+	declare @id int
+
+	select @id = Id from deleted
+
+	delete from PedidoVendaItens where PedidoId = @Id
+
+	dele PedidoVendas set PedidoStatus = 3 where Id = @id
+
+end
+*/
+go
+
+create trigger TEstoqueEntrada
+on EstoqueEntrada
+for insert
+as
+begin
+		declare @id int
+		declare @produtoId int
+		declare @dataEntrada datetime = getdate()
+		declare @qtdAnterior int
+		declare @qtdeEntrada int
+		declare @qtdeRestante int
+
+		select @id = Id, @produtoId = ProdutoId, @qtdeEntrada = QtdeEntrada from inserted
+
+		if (select count(*) from Estoque where produtoId = @produtoId) = 0
+			begin
+				insert Estoque (ProdutoId, Qtde) values (@produtoId, @QtdeEntrada)
+				update EstoqueEntrada set QtdeAnterior = @qtdeEntrada, QtdeRestante = @qtdeEntrada where Id = @id
+			end
+		else
+			begin
+				update EstoqueEntrada set QtdeAnterior = (select Qtde from Estoque where ProdutoId = @produtoId) where Id = @id
+				update Estoque set Qtde += @qtdeEntrada where ProdutoId = @produtoId
+				update EstoqueEntrada set QtdeRestante = (select Qtde from Estoque where ProdutoId = @produtoId) where Id = @id
+			end
+end
 
 
 --phelp PedidoVendaItens
@@ -289,3 +309,9 @@ go
 drop table password_resets
 
 */
+
+
+
+select * from PedidoVendas
+select * from PedidoVendaitens
+select * from PedidoStatus

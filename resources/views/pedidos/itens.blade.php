@@ -11,6 +11,7 @@
                         <thead>
                             <tr>
                                 <td>Cod Produto</td>
+                                <td>Descrição</td>                                
                                 <td>Qtde</td>
                                 <td>Valor Unitário</td>
                                 <td>Valor Total</td>
@@ -22,6 +23,7 @@
                            @foreach($itens as $item)
                             <tr>
                                 <td>{{ $item->ProdutoId }}</td>
+                                <td>{{ $item->Nome }}</td>
                                 <td>{{ $item->Qtde }}</td>
                                 <td>{{ $item->ValorVenda }}</td>
                                 <td>{{ $item->ValorTotal }}</td>
@@ -35,7 +37,7 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="6">
+                                <td colspan="7">
                                     {{--<button class="btn btn-success pull-right">Finalizar</button>--}}
                                     <span class="pull-right">Total: {{ $pedido->ValorTotal }}</span>
                                 </td>

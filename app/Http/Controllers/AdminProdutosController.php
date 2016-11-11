@@ -15,7 +15,12 @@ class AdminProdutosController extends Controller
     }
 
     public function index(){
-        $produtos = $this->model->all();
+        $produtos = \DB::table('Produtos as a')
+            ->leftJoin('Marcas as b', 'a.MarcaId', '=', 'b.Id')
+            ->leftJoin('Categorias as c', 'a.CategoriaId', '=', 'b.Id')
+            ->select('a.Id', 'a.Nome', 'a.Descricao', 'a.PrecoCusto', 'a.PrecoVenda', 'a.Peso', 'a.ProdutoStatus', 'b.Nome as Marca', 'c.Nome as Categoria')
+            ->get();
+        //dd($produtos);
         return view('admin.produtos.index', ['produtos' => $produtos]);
     }
 
