@@ -23,15 +23,20 @@ Route::get('/pedidos', 'PedidoVendasController@index')->middleware('auth');
 Route::get('/pedidos/cancela/{pedidoId}', 'PedidoVendasController@cancela')->middleware('auth');
 Route::get('/pedidos/finaliza/{pedidoId}', 'PedidoVendasController@finaliza')->middleware('auth');
 
-
 Route::get('/pedidos/itens/{pedidoId}', 'PedidoVendaItensController@itens')->middleware('auth');
 
 Route::post('/pedido/itens/add', 'PedidoVendaItensController@addItem')->middleware('auth');
 Route::get('/pedido/itens/remove/{itemId}', 'PedidoVendaItensController@removeItem')->middleware('auth');
 
+Route::get('/cliente/create', 'ClientesController@create');
+Route::post('/cliente/store', 'ClientesController@store');
+Route::get('/cliente/edit', 'ClientesController@edit');
+Route::post('/cliente/update', 'ClientesController@update');
+
 Route::get('/produtos', 'ProdutosController@produtos');
 Route::get('/produtos/categoria/{categoriaId}', 'ProdutosController@categoria');
 Route::get('/produtos/{produtoId}', 'ProdutosController@produto');
+Route::post('/produtos/busca', 'ProdutosController@buscaProdutos');
 /*Admin Categorias*/
 Route::get('/admin/categorias', 'AdminCategoriasController@index')->middleware('admin');
 Route::get('/admin/categorias/create', 'AdminCategoriasController@create')->middleware('admin');

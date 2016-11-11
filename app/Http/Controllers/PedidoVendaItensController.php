@@ -15,11 +15,12 @@ class PedidoVendaItensController extends Controller
     }
 
     public function itens($pedidoId, PedidoVendaItens $itens){
-        $itens = $itens
-                ->join('Produtos', 'PedidoVendaItens.ProdutoId', '=', 'Produtos.Id')
-                //->leftJoin('Marcas', 'PedidoVendaItens.MarcaId', '=', 'Marcas.Id')
-                //->leftJoin('Categorias', 'PedidoVendaItens.CategoriaId', '=', 'Categorias.Id')
-                ->where('PedidoId', $pedidoId)->get();
+
+        $itens = \DB::table('PedidoVendaItens as a')
+            ->leftJoin('Produtos as b', 'a.ProdutoId', '=', 'b.Id')
+            ->select('a.Id', 'a.ProdutoId', 'b.Nome', 'a.Qtde', 'a.ValorVenda', 'a.ValorTotal', 'a.Peso')
+            ->where('PedidoId', $pedidoId)
+            ->get();
         //dd($itens);
         $pedido = PedidoVendas::find($pedidoId);
         return view('pedidos.itens', ['itens' => $itens, 'pedido' => $pedido]);
@@ -72,6 +73,7 @@ class PedidoVendaItensController extends Controller
     public function removeItem($itemId){
         $item = new PedidoVendaItens();
         $item = $item->find($itemId)->delete();
+        //dd($item);
         return redirect()->back();
     }
 }

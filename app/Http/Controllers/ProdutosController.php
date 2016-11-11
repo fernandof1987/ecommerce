@@ -21,4 +21,16 @@ class ProdutosController extends Controller
         $produto = Produtos::find($produtoId);
         return view('produtos.produto', ['produto' => $produto]);
     }
+
+    public function buscaProdutos(Request $request, Produtos $produtos){
+        $busca = $request['search'];
+
+        //Model::where('column', 'LIKE', '%value%')->get();
+
+        $produtos = $produtos->where('ProdutoStatus', 1);
+
+        $produtos = $produtos->where('Nome', 'LIKE', '%' . $busca . '%');
+            
+        return view('produtos.index', ['produtos' => $produtos->paginate(1000)]);
+    }
 }

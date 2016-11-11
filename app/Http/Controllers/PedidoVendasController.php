@@ -16,8 +16,13 @@ class PedidoVendasController extends Controller
     }
 
     public function cancela($pedidoId, PedidoVendas $pedidos){
-        $itens = PedidoVendaItens::where('PedidoId', $pedidoId);
-        $itens->delete();
+        $itens = PedidoVendaItens::where('PedidoId', $pedidoId)->get(['Id']);
+        $itemId = [];
+        foreach($itens as $item){
+           array_push($itemId, $item->Id);
+        }
+        $deleteItens = PedidoVendaItens::destroy($itemId);
+
         $pedido = $pedidos->find($pedidoId);
         $pedido->timestamps = false;
         $pedido->PedidoStatus = 3;
